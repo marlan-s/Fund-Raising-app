@@ -1,0 +1,14 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+
+Effect<dynamic> fadeInSlideUpEffect({double offset = 20}) {
+  return [
+    const FadeEffect(duration: Duration(milliseconds: 400)),
+    SlideEffect(
+      begin: Offset(0, offset),
+      end: Offset.zero,
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeOutQuart,
+    ),
+  ].combine;
+}
