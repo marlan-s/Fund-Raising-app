@@ -1,0 +1,184 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:fundraising_dashboard/features/dashboard/cubit/dashboard_cubit.dart';
+import 'package:fundraising_dashboard/features/dashboard/widgets/metrics_card.dart';
+import 'package:fundraising_dashboard/features/dashboard/widgets/quick_action.dart';
+import 'package:fundraising_dashboard/features/dashboard/widgets/reward_card.dart';
+import 'package:fundraising_dashboard/shared/components/app_drawer.dart';
+import 'package:fundraising_dashboard/shared/components/bottom_nav_bar.dart';
+import 'package:fundraising_dashboard/shared/components/shimmer_loading.dart';
+import 'package:fundraising_dashboard/shared/utils/animations.dart';
+
+class DashboardScreen extends StatelessWidget {
+  const DashboardScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      drawer: const AppDrawer(),
+      bottomNavigationBar: const BottomNavBar(selectedIndex: 0),
+      body: BlocBuilder<DashboardCubit, DashboardState>(
+        builder: (context, state) {
+          if (state is DashboardLoading) {
+            return const ShimmerLoading();
+          } else if (state is DashboardLoaded) {
+            return CustomScrollView(
+              slivers: [
+                SliverAppBar(
+                  expandedHeight: 120,
+                  flexibleSpace: FlexibleSpaceBar(
+                    title: Text(
+                      'Welcome, ${state.internName}',
+                      style: const TextStyle(fontSize: 18),
+                    ),
+                  ),
+                ),
+                SliverPadding(
+                  padding: const EdgeInsets.all(16),
+                  sliver: SliverToBoxAdapter(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Referral Code
+                        Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.share, color: Colors.blue),
+                                const SizedBox(width: 12),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Your Referral Code',
+                                      style: Theme.of(context).textTheme.bodySmall,
+                                    ),
+                                    Text(
+                                      state.referralCode,
+                                      style: Theme.of(context).textTheme.titleLarge,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ).animate(effects: [
+                          fadeInSlideUpEffect()
+                        ]),
+                        const SizedBox(height: 24),
+                        // Metrics
+                        GridView.count(
+                          crossAxisCount: 2,
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                          children: [
+                            MetricsCard(
+                              title: 'Total Raised',
+                              value: '₹${state.totalRaised}',
+                              icon: Icons.attach_money,
+                              progress: state.raisedPercentage,
+                            ).animate(delay: 100.ms, effects: [
+                              fadeInSlideUpEffect()
+                            ]),
+                            MetricsCard(
+                              title: 'Target',
+                              value: '₹${state.targetAmount}',
+                              icon: Icons.flag,
+                              progress: 1.0,
+                            ).animate(delay: 200.ms, effects: [
+                              fadeInSlideUpEffect()
+                            ]),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        // Rewards Section
+                        Text(
+                          'Your Rewards',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ).animate(delay: 300.ms, effects: [
+                          fadeInSlideUpEffect()
+                        ]),
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          height: 180,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: state.rewards.length,
+                            itemBuilder: (context, index) {
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 16),
+                                child: RewardCard(
+                                  reward: state.rewards[index],
+                                ).animate(delay: (400 + (index * 100)).ms, effects: [
+                                  fadeInSlideUpEffect()
+                                ]),
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        // Quick Actions
+                        Text(
+                          'Quick Actions',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ).animate(delay: 800.ms, effects: [
+                          fadeInSlideUpEffect()
+                        ]),
+                        const SizedBox(height: 12),
+                        GridView.count(
+                          crossAxisCount: 2,
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                          childAspectRatio: 1.5,
+                          children: [
+                            QuickAction(
+                              icon: Icons.leaderboard,
+                              label: 'Leaderboard',
+                              onTap: () => Navigator.pushNamed(
+                                  context, Routes.leaderboard),
+                            ).animate(delay: 900.ms, effects: [
+                              fadeInSlideUpEffect()
+                            ]),
+                            QuickAction(
+                              icon: Icons.announcement,
+                              label: 'Announcements',
+                              onTap: () => Navigator.pushNamed(
+                                  context, Routes.announcements),
+                            ).animate(delay: 1.seconds, effects: [
+                              fadeInSlideUpEffect()
+                            ]),
+                            QuickAction(
+                              icon: Icons.history,
+                              label: 'History',
+                              onTap: () {},
+                            ).animate(delay: 1100.ms, effects: [
+                              fadeInSlideUpEffect()
+                            ]),
+                            QuickAction(
+                              icon: Icons.settings,
+                              label: 'Settings',
+                              onTap: () {},
+                            ).animate(delay: 1200.ms, effects: [
+                              fadeInSlideUpEffect()
+                            ]),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }
+          return Container();
+        },
+      ),
+    );
+  }
+}
