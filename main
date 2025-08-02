@@ -1,0 +1,41 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fundraising_dashboard/app/app.dart';
+import 'package:fundraising_dashboard/app/theme/theme_provider.dart';
+import 'package:provider/provider.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => ThemeProvider(),
+      child: const MyApp(),
+    ),
+  );
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => DashboardCubit()),
+        BlocProvider(create: (_) => LeaderboardCubit()),
+        BlocProvider(create: (_) => AnnouncementsCubit()),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Fundraising Dashboard',
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: themeProvider.themeMode,
+        onGenerateRoute: AppRoutes.onGenerateRoute,
+        home: const LoginScreen(),
+      ),
+    );
+  }
+}
