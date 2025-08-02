@@ -1,0 +1,62 @@
+import 'package:bloc/bloc.dart';
+import 'package:equatable/equatable.dart';
+import 'package:fundraising_dashboard/shared/models/reward.dart';
+import 'package:fundraising_dashboard/shared/utils/mock_data.dart';
+
+part 'dashboard_state.dart';
+
+class DashboardCubit extends Cubit<DashboardState> {
+  DashboardCubit() : super(DashboardLoading()) {
+    loadDashboardData();
+  }
+
+  Future<void> loadDashboardData() async {
+    emit(DashboardLoading());
+    await Future.delayed(const Duration(seconds: 1)); // Simulate loading
+    emit(DashboardLoaded(
+      internName: MockData.internName,
+      referralCode: MockData.referralCode,
+      totalRaised: MockData.totalRaised,
+      targetAmount: MockData.targetAmount,
+      rewards: MockData.rewards,
+    ));
+  }
+}
+
+part of 'dashboard_cubit.dart';
+
+abstract class DashboardState extends Equatable {
+  const DashboardState();
+
+  @override
+  List<Object> get props => [];
+}
+
+class DashboardLoading extends DashboardState {}
+
+class DashboardLoaded extends DashboardState {
+  final String internName;
+  final String referralCode;
+  final int totalRaised;
+  final int targetAmount;
+  final List<Reward> rewards;
+
+  double get raisedPercentage => totalRaised / targetAmount;
+
+  const DashboardLoaded({
+    required this.internName,
+    required this.referralCode,
+    required this.totalRaised,
+    required this.targetAmount,
+    required this.rewards,
+  });
+
+  @override
+  List<Object> get props => [
+        internName,
+        referralCode,
+        totalRaised,
+        targetAmount,
+        rewards,
+      ];
+}
